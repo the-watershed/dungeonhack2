@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dungeon Generator Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+        }
+        pre {
+            background-color: #e8e8e8;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+            color: #d63384;
+        }
+        ul {
+            list-style-type: square;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dungeon Generator Documentation</h1>
+        <p>This document provides an overview of the dungeon generator code.</p>
+
+        <h2>Room Class</h2>
+        <p>The <code>Room</code> class represents a room in the dungeon. It has the following attributes:</p>
+        <ul>
+            <li><code>top_left_x</code>: The x-coordinate of the top-left corner of the room.</li>
+            <li><code>top_left_y</code>: The y-coordinate of the top-left corner of the room.</li>
+            <li><code>width</code>: The width of the room.</li>
+            <li><code>height</code>: The height of the room.</li>
+            <li><code>inventory</code>: A list representing the inventory of the room.</li>
+            <li><code>is_secret</code>: A boolean indicating if the room is secret.</li>
+            <li><code>is_safe</code>: A boolean indicating if the room is safe.</li>
+            <li><code>is_exit</code>: A boolean indicating if the room is an exit.</li>
+            <li><code>is_entrance</code>: A boolean indicating if the room is an entrance.</li>
+        </ul>
+        <pre><code>class Room:
+    def __init__(self, top_left_x, top_left_y, width, height):
+        self.top_left_x = top_left_x
+        self.top_left_y = top_left_y
+        self.width = width
+        self.height = height
+        self.inventory = []
+        self.is_secret = False
+        self.is_safe = False
+        self.is_exit = False
+        self.is_entrance = False
+</code></pre>
+
+        <h2>Function: generate_map</h2>
+        <p>The <code>generate_map</code> function generates a map of given width and height filled with empty spaces.</p>
+        <pre><code>def generate_map(width, height):
+    return [[' ' for _ in range(width)] for _ in range(height)]
+</code></pre>
+
+        <h2>Function: can_place_room</h2>
+        <p>The <code>can_place_room</code> function checks if a room can be placed at the given position without overlapping other rooms.</p>
+        <pre><code>def can_place_room(map, top_left_x, top_left_y, room_width, room_height, min_distance=2):
+    for i in range(-min_distance, room_height + min_distance):
+        for j in range(-min_distance, room_width + min_distance):
+            if 0 <= top_left_y + i < len(map) and 0 <= top_left_x + j < len(map[0]):
+                if map[top_left_y + i][top_left_x + j] == '#':
+                    return False
+    return True
+</code></pre>
+
+        <h2>Function: add_random_rooms</h2>
+        <p>The <code>add_random_rooms</code> function adds random rooms to the map until at least 50% of the map is filled with rooms. It ensures that at least 90% of the rooms are at least 2 squares away from the nearest room.</p>
+        <pre><code>def add_random_rooms(map):
+    height = len(map)
+    width = len(map[0])
+    total_tiles = width * height
+    filled_tiles = 0
+    max_attempts = 1000  # Maximum number of attempts to place a room
+    attempts = 0 
+    square_rooms = 0
+    rooms_placed = 0
+    rooms_with_distance = 0
+    rooms = []
+    
+    while filled_tiles < total_tiles // 2 and attempts < max_attempts:
+        if square_rooms < 4 or random.random() < 0.5:
+            room_width = random.randint(4, min(width, height) // 2)  # Ensure room width is at least 4
+            room_height = (room_width * 3) // 4  # Ensure room height is 3/4 of the width
+            square_rooms += 1
+        else:
+            room_width = random.randint(2, min(width, height) // 2)  # Ensure room width is at least 2
+            room_height = random.randint(2, min(width, height) // 2)  # Ensure room height is at least 2
+
+        # Add padding of 1 to all sides of the room
+        padded_room_width = room_width + 2
+        padded_room_height = room_height + 2
+
+        top_left_x = random.randint(1, width - padded_room_width - 1)
+        top_left_y = random.randint(1, height - padded_room_height - 1)
+
+        if can_place_room(map, top_left_x, top_left_y, padded_room_width, padded_room_height):
+            for i in range(padded_room_height):
+                for j in range(padded_room_width):
+                    if i == 0 or i == padded_room_height - 1 or j == 0 or j == padded_room_width - 1:
+                        if map[top_left_y + i][top_left_x + j] == ' ':
+                            map[top_left_y + i][top_left_x + j] = '#'
+                            filled_tiles += 1
+            rooms_placed += 1
+            if can_place_room(map, top_left_x, top_left_y, padded_room_width, padded_room_height, min_distance=2):
+                rooms_with_distance += 1
+
+            room = Room(top_left_x, top_left_y, padded_room_width, padded_room_height)
+            rooms.append(room)
+
+            prev_top_left_x = top_left_x
+            prev_top_left_y = top_left_y
+            prev_padded_room_width = padded_room_width
+            prev_padded_room_height = padded_room_height
+
+        attempts += 1
+
+    if rooms_placed > 0 and rooms_with_distance / rooms_placed < 0.9:
+        print("Warning: Less than 90% of the rooms are at least 2 squares away from the nearest room.")
+
+    return rooms
+</code></pre>
+
+        <h2>Main Function</h2>
+        <p>The <code>main</code> function generates a map with random rooms and prints it. It also prints the details of each room.</p>
+        <pre><code># Main function to generate and print the map
+def main():
+    """
+    Main function to generate a map with random rooms and print it.
+    """
+    width = 80
+    height = 25
+    
+    map = generate_map(width, height)
+    rooms = add_random_rooms(map)
+    
+    for row in map:
+        print(''.join(row))
+
+    # Print room details
+    for room in rooms:
+        print(f"Room at ({room.top_left_x}, {room.top_left_y}) with size {room.width}x{room.height}")
+        print(f"Inventory: {room.inventory}")
+        print(f"Is Secret: {room.is_secret}, Is Safe: {room.is_safe}, Is Exit: {room.is_exit}, Is Entrance: {room.is_entrance}")
+
+if __name__ == "__main__":
+    main()
+</code></pre>
+
+        <p><em>Generated by Copilot</em></p>
+    </div>
+</body>
+</html>
+
+<!-- Generated by Copilot -->
