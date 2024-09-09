@@ -90,10 +90,8 @@ def add_random_rooms(map):
         if can_place_room(map, top_left_x, top_left_y, padded_room_width, padded_room_height):
             for i in range(padded_room_height):
                 for j in range(padded_room_width):
-                    if i == 0 or i == padded_room_height - 1 or j == 0 or j == padded_room_width - 1:
-                        if map[top_left_y + i][top_left_x + j] == ' ':
-                            map[top_left_y + i][top_left_x + j] = '#'
-                            filled_tiles += 1
+                    map[top_left_y + i][top_left_x + j] = '#'
+                    filled_tiles += 1
             rooms_placed += 1
             if can_place_room(map, top_left_x, top_left_y, padded_room_width, padded_room_height, min_distance=2):
                 rooms_with_distance += 1
@@ -113,18 +111,116 @@ def add_random_rooms(map):
 
     return rooms
 
-# Main function to generate and print the map
+# Function to calculate the distance between two rooms
+def calculate_distance(room1, room2):
+    """
+    Calculates the Manhattan distance between two rooms.
+    
+    Args:
+    room1 (Room): The first room.
+    room2 (Room): The second room.
+    
+    Returns:
+    int: The Manhattan distance between the two rooms.
+    """
+    room1_center_x = room1.top_left_x + room1.width // 2
+    room1_center_y = room1.top_left_y + room1.height // 2
+    room2_center_x = room2.top_left_x + room2.width // 2
+    room2_center_y = room2.top_left_y + room2.height // 2
+    return abs(room1_center_x - room2_center_x) + abs(room1_center_y - room2_center_y)
+
+# Function to connect rooms with hallways
+def connect_rooms(map, rooms):
+    """
+    Connects rooms with hallways.
+    
+    Args:
+    map (list): The map where rooms are being placed.
+    rooms (list): The list of rooms to be connected.
+    """
+    for i in range(len(rooms) - 1):
+        room1 = rooms[i]
+        room2 = rooms[i + 1]
+
+        # Get the perimeter points of the rooms
+        room1_perimeter_x = room1.top_left_x + room1.width // 2
+        room1_perimeter_y = room1.top_left_y + room1.height // 2
+        room2_perimeter_x = room2.top_left_x + room2.width // 2
+        room2_perimeter_y = room2.top_left_y + room2.height // 2
+
+        # Adjust the perimeter points to be at the edge of the rooms
+        if room1_perimeter_x < room2.top_left_x:
+            room1_perimeter_x = room1.top_left_x + room1.width - 1
+        elif room1_perimeter_x > room2.top_left_x + room2.width:
+            room1_perimeter_x = room1.top_left_x
+
+        if room1_perimeter_y < room2.top_left_y:
+            room1_perimeter_y = room1.top_left_y + room1.height - 1
+        elif room1_perimeter_y > room2.top_left_y + room2.height:
+            room1_perimeter_y = room1.top_left_y
+
+        if room2_perimeter_x < room1.top_left_x:
+            room2_perimeter_x = room2.top_left_x + room2.width - 1
+        elif room2_perimeter_x > room1.top_left_x + room1.width:
+            room2_perimeter_x = room2.top_left_x
+
+        if room2_perimeter_y < room1.top_left_y:
+            room2_perimeter_y = room2.top_left_y + room2.height - 1
+        elif room2_perimeter_y > room1.top_left_y + room1.height:
+            room2_perimeter_y = room2.top_left_y
+
+        # Create horizontal hallway
+        if room1_perimeter_x != room2_perimeter_x:
+            for x in range(min(room1_perimeter_x, room2_perimeter_x), max(room1_perimeter_x, room2_perimeter_x) + 1):
+                map[room1_perimeter_y - 1][x] = '#'
+                map[room1_perimeter_y][x] = '#'
+                map[room1_perimeter_y + 1][x] = '#'
+
+        # Create vertical hallway
+        if room1_perimeter_y != room2_perimeter_y:
+            for y in range(min(room1_perimeter_y, room2_perimeter_y), max(room1_perimeter_y, room2_perimeter_y) + 1):
+                map[y][room2_perimeter_x - 1] = '#'
+                map[y][room2_perimeter_x] = '#'
+                map[y][room2_perimeter_x + 1] = '#'
+
+# Function to create a black mask with white outlines
+def create_mask(map):
+    """
+    Creates a black mask with white outlines of the map.
+    
+    Args:
+    map (list): The map to create a mask for.
+    
+    Returns:
+    list: The mask with white outlines.
+    """
+    mask = [[' ' for _ in range(len(map[0]))] for _ in range(len(map))]
+    for y in range(1, len(map) - 1):
+        for x in range(1, len(map[0]) - 1):
+            if map[y][x] == '#':
+                if (map[y-1][x] == ' ' or map[y+1][x] == ' ' or
+                    map[y][x-1] == ' ' or map[y][x+1] == ' '):
+                    mask[y][x] = '#'
+    return mask
+
+# Main function to generate and print the map and mask
 def main():
     """
-    Main function to generate a map with random rooms and print it.
+    Main function to generate a map with random rooms, print it, and create a mask.
     """
     width = 80
     height = 25
     
     map = generate_map(width, height)
     rooms = add_random_rooms(map)
+    connect_rooms(map, rooms)
     
     for row in map:
+        print(''.join(row))
+
+    mask = create_mask(map)
+    print("\nMask:\n")
+    for row in mask:
         print(''.join(row))
 
     # Print room details
@@ -158,4 +254,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# Generated by Copilotcreate
+# Generated by Copilot
