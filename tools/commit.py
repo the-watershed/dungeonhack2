@@ -13,7 +13,7 @@ def main():
 
     # Add all changes
     print("Adding changes...")
-    run_command("git add .")
+    run_command("git add almost.")
 
     # Commit changes
     print("Committing changes...")
