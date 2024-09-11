@@ -1,0 +1,9 @@
+# Folders
+dist
+node_modules
+
+# Files
+script.js
+script.js.map
+*.tsbuildinfo
+*.tgz
