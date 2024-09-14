@@ -1,0 +1,5 @@
+entry = {
+    "name": "api_key.txt",
+    "path": "/tools",
+    "type": "file"
+}
