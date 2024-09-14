@@ -12,7 +12,7 @@ pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float
 pipe = pipe.to(device)
 
 def generate_images_from_text(text, num_images=10):
-    image_paths = []rrr33333333333
+    image_paths = []
     for i in range(num_images):
         image = pipe(text).images[0]
         image_path = f'frame_{i}.png'
