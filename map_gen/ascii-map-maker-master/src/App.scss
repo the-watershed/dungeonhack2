@@ -1,0 +1,150 @@
+$theme-main: #eee;
+
+button:focus {
+  // background-color: inherit;
+}
+
+.hidden {
+  display: none;
+}
+
+.App {
+  flex: 1;
+}
+
+.Logo {
+  margin: 12px;
+  height: 32px !important;
+  width: 32px !important;
+}
+
+.NavBar {
+  margin-bottom: 24px; 
+  .nav-title {
+    cursor: pointer;
+    border-right: solid 1px white;
+    padding-right: 8px;
+    margin-right: 8px;
+  }
+  .nav-buttons-right {
+    button {
+      margin-right: 8px; 
+    }
+  }
+  .Toolbar {
+    flex-grow: 1;
+    .btn-tool {
+      margin: 0px 8px;
+    }
+  }
+}
+
+.TileMap {
+  overflow: scroll;
+  border: 30px solid $theme-main;
+  max-height: 75vh;
+  background-color: #eee;
+}
+
+.ToolPanel {
+  background-color: $theme-main;
+  .tool-pane {
+    padding: 0px 30px 30px 30px;
+  }
+}
+
+.TileForm, .Settings, .LayerForm {
+  .form {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    input {
+      border-bottom: none;
+      padding: 0px 12px; 
+    }
+    .text-field {
+      margin: 8px 0px;
+    }
+    .inline-group {
+      flex-direction: row;
+      justify-content: center;
+    }
+    .grid-field {
+      max-width: 100px;
+      margin-top: 12px;
+      margin-right: 20px;
+    }
+    .form-label {
+      color: #777;
+      font-size: 16px;
+      padding: 12px;
+      border: 1px solid #bbb;
+      border-bottom: none;
+      border-radius: 4px 4px 0px 0px;
+      background-color: white;
+    }
+  }
+}
+
+.TilePalette {
+  .btn-full-width {
+    width: 100%;
+  }
+}
+
+.TilePlate,
+.LayerPlate {
+  flex: 1;
+  justify-content: flex-end;
+  flex-direction: row;
+  display: flex;
+}
+
+
+.Layers {
+  .layer-edit-form {
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    display: flex;
+    padding: 0px 10px;
+  }
+}
+.LayerPlate {
+  justify-content: flex-start;
+  padding: 10px;
+}
+
+.layer-selected {
+  background-color: #d8d8d8;
+  border-radius: 5px;
+}
+
+.JsonView {
+  padding: 0px 74px;
+}
+
+.TilePreview {
+  display: inline;
+  background-color: #333;
+  font-size: 24px;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.SaveList {
+  background-color: $theme-main;
+  max-width: 400px;
+  position: absolute;
+  right: 0px;
+  top: 65px;
+  height: calc(100vh - 65px);
+  padding: 24px;
+  z-index: 10;
+}
+
+.konvajs-content {
+  background-color: #333;
+}
+
